@@ -85,7 +85,8 @@ class CUDA_Accelerator(DeepSpeedAccelerator):
         return torch.cuda.device_count()
 
     def synchronize(self, device_index=None):
-        return torch.cuda.synchronize(device_index)
+        # None breaks torch.compile and no index makes Dynamo sync device 0, so pass the current device.
+        return torch.cuda.synchronize(device_index if device_index is not None else torch.cuda.current_device())
 
     # RNG APIs
     def random(self):

@@ -62,7 +62,8 @@ class XPU_Accelerator(DeepSpeedAccelerator):
         return torch.xpu.device_count()
 
     def synchronize(self, device_index=None):
-        return torch.xpu.synchronize(device_index)
+        # None breaks torch.compile and no index makes Dynamo sync device 0, so pass the current device.
+        return torch.xpu.synchronize(device_index if device_index is not None else torch.xpu.current_device())
 
     # RNG APIs
     def random(self):
